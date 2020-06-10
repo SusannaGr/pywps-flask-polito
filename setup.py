@@ -1,4 +1,4 @@
-# Copyright (c) <year> <copyright holders>
+# Copyright (c) 2020 - Susanna Grasso
 # 
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,7 +51,7 @@ config = {
     'license': 'MIT',
     'platforms': 'all',
     'url': 'http://pywps.org',
-    'download_url': 'https://github.com/SusannaGr/pywps-flask-grasso',
+    'download_url': 'https://github.com/SusannaGr/pywps-flask-polito',
     'maintainer': 'Susanna Grasso',
     'classifiers': [
         'Development Status :: 5 - Production/Stable',
