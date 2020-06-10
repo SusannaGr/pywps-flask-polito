@@ -21,35 +21,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+#!/usr/bin/env python3
+
 import os
 import flask
 
 import pywps
 from pywps import Service
 
-from processes.sleep import Sleep
-from processes.ultimate_question import UltimateQuestion
-from processes.centroids import Centroids
 from processes.sayhello import SayHello
+from processes.sleep import Sleep
 from processes.feature_count import FeatureCount
-from processes.buffer import Buffer
 from processes.area import Area
 from processes.bboxinout import Box
-from processes.jsonprocess import TestJson
-
+from processes.test import Test
+from processes.test_syspath import Test_syspath
+from processes.test_grass import Test_Grass
+from processes.test_grass2 import Test_Grass2
+from processes.grassbuffer import GrassBuffer
+from processes.renerfor_delimitazione import Renerfor_delimitazione
+from processes.return_pdf_metalink import Return_pdf_metalink
+from processes.renerfor_descrittori_test import Renerfor_descrittori
 
 app = flask.Flask(__name__)
 
 processes = [
-    FeatureCount(),
     SayHello(),
-    Centroids(),
-    UltimateQuestion(),
     Sleep(),
-    Buffer(),
+    FeatureCount(),
     Area(),
     Box(),
-    TestJson()
+    Test(),
+    Test_syspath(),
+    Test_Grass(),
+    Test_Grass2(),
+    GrassBuffer(),
+    Renerfor_delimitazione(),
+    Return_pdf_metalink(),
+    Renerfor_descrittori(),
 ]
 
 # For the process list on the home page
@@ -61,7 +70,7 @@ for process in processes:
     process_descriptor[identifier] = abstract
 
 # This is, how you start PyWPS instance
-service = Service(processes, ['pywps.cfg'])
+service = Service(processes, ['pywps_demo.cfg'])
 
 
 @app.route("/")
