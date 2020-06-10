@@ -10,7 +10,7 @@ from configparser import ConfigParser
 config = ConfigParser()
 proc_dir = os.path.dirname(os.path.abspath(__file__))
 #For accessing the file in the parent folder of the current folder
-file= os.path.join(proc_dir, '../pywps.cfg')
+file= os.path.join(proc_dir, '/etc/pywps.cfg')
 config.read(file)
 
 class Test_Grass2(Process):
@@ -26,15 +26,11 @@ class Test_Grass2(Process):
             outputs=outputs,
             store_supported=True,
             status_supported=True,
-            # grass_location="/home/osboxes/grassdata/RENERFOR"
-            # grass_location="epsg:32632"
         )
 
     def _handler(self, request, response):
         import logging
         LOGGER = logging.getLogger(__name__)
-        #LOGGER = logging.getLogger('PYWPS')
-
         print ('------------------ Start Test_Grass2 -------------------')
         LOGGER.info("prova test logger")
 
@@ -44,11 +40,9 @@ class Test_Grass2(Process):
         print("grass.script importato!")
 
 	## Launch session
-	## gsetup.init(gisbase, gisdb, location, mapset)
         
-        #GISBASE="/usr/local/src/grass7/grass-7.8.1/dist.x86_64-pc-linux-gnu"
         GISBASE=config.get("grass", "gisbase")
-        GISDBASE="/home/osboxes/grassdata"
+        GISDBASE=config.get("grass", "gisdbase")
         location="EPSG32632"
         mapset="PROVA"
         gsetup.init(GISBASE,GISDBASE, location, mapset)

@@ -10,8 +10,13 @@ import shutil
 import logging
 LOGGER = logging.getLogger('PYWPS')
 
-## To import GISBASE from pywps.cfg
-import pywps.configuration as config
+## To import GISBASE and GISDBASE from pywps.cfg
+from configparser import ConfigParser
+config = ConfigParser()
+proc_dir = os.path.dirname(os.path.abspath(__file__))
+#For accessing the file in the parent folder of the current folder
+file= os.path.join(proc_dir, '/etc/pywps.cfg')
+config.read(file)
 
 class Renerfor_delimitazione(Process):
     """Main process class"""
@@ -66,18 +71,16 @@ class Renerfor_delimitazione(Process):
         coordY = float(request.inputs['InputY'][0].data)
 
         #Set variabili per richiamare grass script
-        GISBASE = config.get_config_value('grass', 'gisbase')
+        GISBASE = config.get('grass', 'gisbase')
         os.environ['GRASS_SKIP_MAPSET_OWNER_CHECK'] = '1' ## aggiunto dopo
-
         import grass.script as grass
         import grass.script.setup as gsetup
 
         print("---- Start renerfor_delimitazione process ---- ")
 
         #Set up location and mapset (eventualmente da cambiare) per richiamare questo mapset grass da python
-        GISDBASE="/home/osboxes/grassdata"
+        GISDBASE=config.get("grass", "gisdbase")
         location="EPSG32632"
-        #mapset="PERMANENT"
         mapset="PROVA"
         gsetup.init(GISBASE,GISDBASE, location, mapset)
 
@@ -102,7 +105,7 @@ class Renerfor_delimitazione(Process):
         #grass.run_command('g.region', raster='piemonte_drain_r100@PERMANENT', quiet=True)
 
         #estrazione bacino
-        p2= grass.start_command('r.water.outlet', input='piemonte_drain_r100@PROVA', output='BACINO', coordinates='%f,%f' %(coordX,coordY), overwrite=True, stderr=subprocess.PIPE)
+        p2=grass.start_command('r.water.outlet', input='piemonte_drain_r100@PROVA', output='BACINO', coordinates='%f,%f' %(coordX,coordY), overwrite=True, stderr=subprocess.PIPE)
         stdoutdata, stderrdata = p2.communicate()
         print("Error occured: %s" % stderrdata)
 
@@ -114,13 +117,19 @@ class Renerfor_delimitazione(Process):
         #tmpFolderPath=os.getcwd()
         #uid=str(self.pywps.UUID)
 
-        outpath=config.get_config_value("server", "outputpath")
+        outpath=config.get("server", "outputpath")
         outfile=os.path.join(outpath,nome_bacino+".gml")
         if os.path.isfile(outfile):
             os.remove(outfile)
         res=grass.start_command('v.out.ogr', flags='c', input='BACINOvect', type="area", output=outfile, format="GML", stderr=subprocess.PIPE)
         stdoutdata, stderrdata = res.communicate()
-        print("Error occured: %s" % stderrdata)
+        print("Error occured: %s" % stderrdata) 
+
+        #NEW - creo anche l'output in formato geojson
+        outfile2=os.path.join(outpath,nome_bacino+".geojson")
+        if os.path.isfile(outfile2):
+            os.remove(outfile2)
+        grass.start_command('v.out.ogr', flags='c', input='BACINOvect', type="area", output=outfile2, format="GeoJSON", stderr=subprocess.PIPE)
 
         #res=grass.run_command('v.out.ogr', 'c', input='BACINOvect', type='area', dsn='%s' %("shapefilebacino-"+str(uuid)+".shp"), format='ESRI_Shapefile')
 

@@ -1,11 +1,10 @@
 from pywps import Process, LiteralInput, ComplexInput, ComplexOutput, FORMATS, Format
 from pywps.inout.outputs import MetaLink, MetaLink4, MetaFile
-import pywps.configuration as config
-
 from pywps.inout.literaltypes import AllowedValue
 from pywps.app.Common import Metadata
 
 import sys,os,re,math
+import subprocess
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -15,6 +14,14 @@ from math import gamma,log,sqrt
 
 #Importa lo script python
 from . import funzioni_BurrXII_browser as fun
+
+## To import GISBASE and GISDBASE from pywps.cfg
+from configparser import ConfigParser
+config = ConfigParser()
+proc_dir = os.path.dirname(os.path.abspath(__file__))
+#For accessing the file in the parent folder of the current folder
+file= os.path.join(proc_dir, '/etc/pywps.cfg')
+config.read(file)
 
 import logging
 LOGGER = logging.getLogger("PYWPS")
@@ -28,7 +35,7 @@ class Renerfor_descrittori(Process):
                          min_occurs=1),
             ComplexInput('vectorbacino', 'Vettoriale del bacino',
                           abstract="Vettoriale del bacino delimitato in formato GML-XML",
-                          supported_formats=[Format('application/gml+xml')]
+                          supported_formats=[Format('application/gml+xml'),Format('application/vnd.geo+json')]
                           )
         ]
         outputs = [
@@ -65,8 +72,8 @@ class Renerfor_descrittori(Process):
 
         # Variabili per output
         workdir=self.workdir
-        file_path = config.get_config_value('server', 'outputpath')
-        file_url = config.get_config_value('server', 'outputurl')
+        file_path = config.get('server', 'outputpath')
+        file_url = config.get('server', 'outputurl')
 
         nome_report_PDF="Report_CDP_"+str(self.uuid)+".pdf"
         nome_grafico="CDP_"+str(self.uuid)+".png"
@@ -80,16 +87,24 @@ class Renerfor_descrittori(Process):
         import grass.script as grass
         import grass.script.setup as gsetup
 
-        GISBASE = config.get_config_value('grass', 'gisbase')
-        GISDBASE="/home/osboxes/grassdata"
+        GISBASE=config.get('grass', 'gisbase')
+        GISDBASE=config.get("grass", "gisdbase")
         location="EPSG32632"
         mapset="PROVA"
         gsetup.init(GISBASE,GISDBASE, location, mapset)
+
+        gisenv=grass.parse_command('g.gisenv', flags='n')
+        print("Test gisenv: %s" % gisenv)
+
+        list=grass.parse_command('g.list', type="rast")
+        print("g.list rast: %s " %list)
       
         ######### ESTRAZIONE DESCRITTORI DEL BACINO DA GRASS #########
         print('######### ESTRAZIONE DESCRITTORI DEL BACINO DA GRASS #########')
         #caricamento vettoriale in GRASS
-        grass.start_command('v.in.ogr', input=vectorbacino, output='basin', overwrite = True, min_area='0')
+        res=grass.start_command('v.in.ogr', input=vectorbacino, output='basin', overwrite = True, min_area='0',stderr=subprocess.PIPE)
+        stdoutdata, stderrdata = res.communicate()
+        print("Error occured: %s" % stderrdata)
 
         # Configurazione della regione di GRASS
         grass.run_command('g.region', vector='basin')

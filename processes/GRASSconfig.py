@@ -1,13 +1,12 @@
 import os,sys
 from configparser import ConfigParser
 config = ConfigParser()
-file='/var/www/pywps_env/pywps-flask/pywps.cfg'
-#file='../pywps.cfg'
+file='/etc/pywps.cfg'
 config.read(file)
 
 def fun_config():
     GISBASE=config.get("grass", "gisbase")
-    #GISBASE="/usr/local/src/grass7/grass-7.8.1/dist.x86_64-pc-linux-gnu"
+    #GISBASE="gisbase=/usr/lib/grass78"
     GRASS_PATH=[os.path.join(GISBASE, "bin"),os.path.join(GISBASE, "scripts")]
     GRASS_LD_LIBRARY_PATH=os.path.join(GISBASE, "lib")
     GRASS_PYTHONPATH=[os.path.join(GISBASE, "etc/python"), os.path.join(GISBASE, "etc/python/grass/script/")]
