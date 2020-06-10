@@ -1,4 +1,4 @@
-# Copyright (c) 2020 - Susanna Grasso
+# Copyright (c) <year> <copyright holders>
 # 
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,8 +30,7 @@ with open('VERSION.txt') as ff:
 
 with open('requirements.txt') as f:
     INSTALL_REQUIRES = f.read().splitlines()[:-1]
-    #INSTALL_REQUIRES.append('pywps=='+VERSION)
-    INSTALL_REQUIRES.append('pywps')
+    INSTALL_REQUIRES.append('pywps=='+VERSION)
 
 DESCRIPTION = (
 '''PyWPS is an implementation of the Web Processing Service standard from the
@@ -51,8 +50,10 @@ config = {
     'license': 'MIT',
     'platforms': 'all',
     'url': 'http://pywps.org',
-    'download_url': 'https://github.com/SusannaGr/pywps-flask-polito',
-    'maintainer': 'Susanna Grasso',
+    'download_url': 'https://github.com/lazaa32/pywps-flask',
+    'author_email': 'luis.a.de.sousa@gmail.com',
+    'maintainer': 'Luis de Sousa',
+    'maintainer_email': 'luis.de.sousa@protonmail.ch',
     'classifiers': [
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
@@ -65,8 +66,9 @@ config = {
     ],
     'version': VERSION,
     'install_requires': INSTALL_REQUIRES,
-    #'dependency_links': ['git+https://github.com/geopython/pywps.git@pywps-'+VERSIONPyWPS+'#egg=pywps-'+VERSIONPyWPS],
-    'dependency_links': ['git+https://github.com/geopython/pywps.git'],
+    'dependency_links': [
+        'git+https://github.com/geopython/pywps.git@pywps-'+VERSION+'#egg=pywps-'+VERSION
+     ],
     'packages': ['processes', 'tests'],
     'scripts': ['demo.py'],
     'name': 'pywps-flask'
